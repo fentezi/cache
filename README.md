@@ -7,7 +7,7 @@ This Go package provides a simple in-memory caching mechanism with basic operati
 ## Installation
 
 ```bash
-go get -u github.com/fentezi/caching
+go get -u github.com/fentezi/cache
 ```
 ## Creating a new cache instance
 ```
