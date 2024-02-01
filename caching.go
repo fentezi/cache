@@ -1,7 +1,9 @@
-package cache
+package main
 
 import (
+	"errors"
 	"fmt"
+	"time"
 )
 
 type Cache struct {
@@ -9,7 +11,9 @@ type Cache struct {
 }
 
 type Item struct {
-	Value any
+	Value   any
+	TTL     time.Duration
+	TimeNow time.Time
 }
 
 func New() *Cache {
@@ -18,13 +22,22 @@ func New() *Cache {
 	}
 }
 
-func (c *Cache) Set(key string, value any) {
-	c.items[key] = Item{Value: value}
+func (c *Cache) Set(key string, value any, ttl time.Duration) {
+	c.items[key] = Item{
+		Value:   value,
+		TTL:     ttl,
+		TimeNow: time.Now(),
+	}
 }
 
-func (c *Cache) Get(key string) any {
+func (c *Cache) Get(key string) (any, error) {
+	t := time.Since(c.items[key].TimeNow)
+	if t > c.items[key].TTL {
+		c.Delete(key)
+		return nil, errors.New("key not found")
+	}
 	item, _ := c.items[key]
-	return item.Value
+	return item.Value, nil
 }
 
 func (c *Cache) Delete(key string) {
