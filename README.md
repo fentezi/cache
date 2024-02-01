@@ -15,11 +15,7 @@ cache := caching.New()
 ```
 ## Setting a value in the cache
 ```
-cache.Set("key", "value")
-```
-## Setting a value in the cache
-```
-cache.Set("key", "value")
+cache.Set("key", "value", "time.Duration()")
 ```
 ## Getting a value from the cache
 ```
@@ -37,6 +33,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 	"github.com/fentezi/caching"
 )
 
@@ -45,7 +42,7 @@ func main() {
 	cache := caching.New()
 
 	// Set a value in the cache
-	cache.Set("username", "john_doe")
+	cache.Set("username", "john_doe", time.Second() * 3)
 
 	// Get the value from the cache
 	username := cache.Get("username")
