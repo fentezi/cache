@@ -3,11 +3,13 @@ package main
 import (
 	"errors"
 	"fmt"
+	"sync"
 	"time"
 )
 
 type Cache struct {
 	items map[string]Item
+	mu    sync.Mutex
 }
 
 type Item struct {
@@ -23,6 +25,8 @@ func New() *Cache {
 }
 
 func (c *Cache) Set(key string, value any, ttl time.Duration) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
 	c.items[key] = Item{
 		Value:   value,
 		TTL:     ttl,
@@ -31,6 +35,8 @@ func (c *Cache) Set(key string, value any, ttl time.Duration) {
 }
 
 func (c *Cache) Get(key string) (any, error) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
 	t := time.Since(c.items[key].TimeNow)
 	if t > c.items[key].TTL {
 		c.Delete(key)
@@ -41,6 +47,8 @@ func (c *Cache) Get(key string) (any, error) {
 }
 
 func (c *Cache) Delete(key string) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
 	_, ok := c.items[key]
 	if !ok {
 		fmt.Println("Key not found")
